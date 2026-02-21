@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Gastos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .contenedor {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        input[type="file"] { margin: 20px 0; }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background-color: #45a049; }
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            white-space: pre-wrap;
+            display: none;
+        }
+        .cargando { color: #888; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Analizador de Gastos</h1>
+        <p>Sube un archivo CSV con tus gastos y la IA te dará un análisis detallado.</p>
+        <input type="file" id="archivo" accept=".csv">
+        <br>
+        <button onclick="analizar()">Analizar gastos</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        async function analizar() {
+            const archivo = document.getElementById("archivo").files[0];
+            if (!archivo) {
+                alert("Por favor selecciona un archivo CSV");
+                return;
+            }
+
+            const resultado = document.getElementById("resultado");
+            resultado.style.display = "block";
+            resultado.className = "cargando";
+            resultado.textContent = "Analizando tus gastos...";
+
+            const formData = new FormData();
+            formData.append("archivo", archivo);
+
+            try {
+                const response = await fetch("/analizar", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                resultado.className = "";
+                resultado.textContent = data.analisis || data.error;
+            } catch (error) {
+                resultado.textContent = "Error al conectar con el servidor";
+            }
+        }
+    </script>
+</body>
+</html>
